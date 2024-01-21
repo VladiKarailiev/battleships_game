@@ -1,5 +1,5 @@
 /**
-*  
+*
 * Solution to course project # 1
 * Introduction to programming course
 * Faculty of Mathematics and Informatics of Sofia University
@@ -9,7 +9,7 @@
 * @idnumber 0MI0600319
 * @compiler VC
 *
-* 
+*
 *
 */
 
@@ -17,16 +17,14 @@
 
 using namespace std;
 
-
-constexpr int FIELD_SIZE = 5;
 const int BIGGEST_BOAT_SIZE = 5;
 
+/// Basic Matrix Functions
 bool isValidIndex(size_t size, int x, int y)
 {
 	return (x >= 0 && x <= size - 1 && y >= 0 && y <= size - 1);
 }
 
-/// Basic Matrix Functions
 void fillRowWith(char* arr, size_t size, char ch)
 {
 	for (int i = 0; i < size; i++)
@@ -102,12 +100,12 @@ void printField(char** field, size_t size)
 /// Sinking Ships
 bool checkIfSunkStep(int** field, size_t size, int x, int y, int shipId, int stepX, int stepY)
 {
-	while (isValidIndex(size, x+stepX, y+stepY) && field[x][y] == field[x + stepX][y + stepY])
+	while (isValidIndex(size, x + stepX, y + stepY) && field[x][y] == field[x + stepX][y + stepY])
 	{
 		x += stepX;
 		y += stepY;
 	}
-	
+
 	return !isValidIndex(size, x + stepX, y + stepY) || field[x][y] != -field[x + stepX][y + stepY];
 
 }
@@ -140,9 +138,9 @@ void sinkShip(char** view, int** field, size_t size, int shipId)
 /// Shooting
 char shootAt(int** field, size_t size, int x, int y) /// return codes: {0=>miss,*=>hit,X=>sunk}
 {
-	if(field[x][y]>0)
+	if (field[x][y] > 0)
 		field[x][y] = -field[x][y];
-	
+
 	if (field[x][y] < 0)
 	{
 		if (checkIfSunk(field, size, x, y, field[x][y]))
@@ -201,14 +199,14 @@ void shootPhase(int** playerOneField, char** playerOneView, int** playerTwoField
 		currPlayerView[x][y] = shootAt(currOpponentField, size, x, y);
 		if (currPlayerView[x][y] == 'X')
 		{
-			sinkShip(currPlayerView, currOpponentField, size,  currOpponentField[x][y]); // tuka moje da se optimizira da ne hodi pak prez cqloto
+			sinkShip(currPlayerView, currOpponentField, size, currOpponentField[x][y]); // tuka moje da se optimizira da ne hodi pak prez cqloto
 		}
 
 		if (isLoser(currOpponentField, size))
 		{
 			system("CLS");
 			cout << "Player " << evenTurn + 1 << " WON!\n";
-			printField(currPlayerView,size);
+			printField(currPlayerView, size);
 			cout << "Good game...\n";
 			return;
 		}
@@ -233,9 +231,10 @@ void shootPhase(int** playerOneField, char** playerOneView, int** playerTwoField
 
 		cout << "Press enter to continue...";
 		getchar();
-		if(!isPlayerTwoHuman && !evenTurn)
+		if (!isPlayerTwoHuman && !evenTurn)
 			getchar();
-
+		else if (isPlayerTwoHuman)
+			getchar();
 		evenTurn = !evenTurn;
 	}
 }
@@ -270,13 +269,13 @@ bool isSpaceFree(int** field, size_t size, int x, int y, int boatSize, char orie
 		{
 			if (orientation == 'V') x++;
 			else if (orientation == 'H') y++;
-			
+
 		}
 		else return false;
 	}
 	return true;
 }
-void placeBoatsPhase(int** field, size_t size,int* boatCount, int playerId)
+void placeBoatsPhase(int** field, size_t size, int* boatCount, int playerId)
 {
 
 	int currBoatId = 1;
@@ -291,9 +290,9 @@ void placeBoatsPhase(int** field, size_t size,int* boatCount, int playerId)
 		cout << "You are currently placing a " << i << " size boat, choose orientation\n[H = Horizontal] [V = Vertical]:\n";
 
 		char orientation = ' ';
-		cin >> orientation;
-
-		int x=0, y=0;
+		while (orientation != 'V' && orientation != 'H')
+			cin >> orientation;
+		int x = 0, y = 0;
 
 		cout << "Enter coordinates: ";
 		cin >> x >> y;
@@ -347,35 +346,36 @@ void placeBoatsPhaseComputer(int** field, size_t size, int* boatCount)
 /// ---Placing Boats
 
 /// Game Logic
-void gameLogic(size_t size,bool isPlayerTwoHuman, int* boatCountOne, int* boatCountTwo)
+void gameLogic(size_t size, bool isPlayerTwoHuman, int* boatCountOne, int* boatCountTwo)
 {
 	int** playerOneField = createField(size);
 	int** playerTwoField = createField(size);
-	
+
 	char** playerOneView = createView(size);
 	char** playerTwoView = createView(size);
 
 
-	placeBoatsPhase(playerOneField, size, boatCountOne,1); //Player One Places Boats
+	placeBoatsPhase(playerOneField, size, boatCountOne, 1); //Player One Places Boats
 
 	if (isPlayerTwoHuman)
-		placeBoatsPhase(playerTwoField, size, boatCountTwo,2); //Player Two Places Boats
+		placeBoatsPhase(playerTwoField, size, boatCountTwo, 2); //Player Two Places Boats
 	else
 		placeBoatsPhaseComputer(playerTwoField, size, boatCountTwo);
 
-	shootPhase(playerOneField,playerOneView,playerTwoField,playerTwoView, size,isPlayerTwoHuman);
+	shootPhase(playerOneField, playerOneView, playerTwoField, playerTwoView, size, isPlayerTwoHuman);
 
 
 
 
-	freeMatrix(playerOneField,size);
-	freeMatrix(playerTwoField,size);
-	freeMatrix(playerOneView,size);
-	freeMatrix(playerTwoView,size);
-	
+	freeMatrix(playerOneField, size);
+	freeMatrix(playerTwoField, size);
+	freeMatrix(playerOneView, size);
+	freeMatrix(playerTwoView, size);
+
 }
-/// ---Game Modes
+/// ---Game Logic
 
+/// Game Options
 void getGamemode(int& mode)
 {
 	cout << "Choose gamemode:\n";
@@ -388,34 +388,30 @@ void getFieldSize(int& size)
 {
 	cout << "Enter field size: ";
 	size = 0;
-	cin >> size;
+	while (size <= 0) cin >> size;
+
 }
 void getBoatCounts(int* boatCountOne, int* boatCountTwo)
 {
 	boatCountOne[0] = boatCountTwo[0] = 0;
 	boatCountOne[1] = boatCountTwo[1] = 0;
+	cout << "Choose the count of ships for each size:\n";
+	for (int i = 2; i < 6; i++)
+	{
+		int temp;
+		cout << "Size " << i << ":\n";
+		cin >> temp;
+		if (temp < 0) temp = 0;
+		boatCountOne[i] = boatCountTwo[i] = temp;
+	}
 
-	int temp;
-	cout << "How many boats of each size:\n";
-	cout << "Size 2:\n";
-	cin >> temp;
-	boatCountOne[2] = boatCountTwo[2] = temp;
-	cout << "Size 3: ";
-	cin >> temp;
-	boatCountOne[3] = boatCountTwo[3] = temp;
-	cout << "Size 4: ";
-	cin >> temp;
-	boatCountOne[4] = boatCountTwo[4] = temp;
-	cout << "Size 5: ";
-	cin >> temp;
-	boatCountOne[5] = boatCountTwo[5] = temp;
 }
-
+/// ---Game Options
 
 int main()
 {
 	srand(time(0));
-	int mode = 0,size=0;
+	int mode = 0, size = 0;
 	getGamemode(mode);
 	system("CLS");
 	getFieldSize(size);
@@ -423,19 +419,8 @@ int main()
 	int boatCountOne[6], boatCountTwo[6];
 	getBoatCounts(boatCountOne, boatCountTwo);
 	system("CLS");
-	gameLogic(size,mode-1,boatCountOne,boatCountTwo);
+	gameLogic(size, mode - 1, boatCountOne, boatCountTwo);
 
 	return 0;
 }
 
-
-/*
-indexite pri placevaneto sa za opraqne - Done
-da e po izchisteno kato printva - Done
-vs cpu logic // isplayertwo human i trqq da napraq da si slaga korabite na random - Done
-da se chetat broq korabi - Done
-
-Bugs:
-*sunkvaneto ne go promeni vs na X - Done
-
-*/
